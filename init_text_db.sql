@@ -10,9 +10,10 @@ alter table public.regular_texts
 
 create table public.programming_languages
 (
-    uuid text not null
+    uuid text        not null
         primary key,
-    name text not null
+    name text unique not null,
+    logo text unique not null
 );
 
 alter table public.programming_languages
@@ -45,14 +46,25 @@ values (gen_random_uuid(),
         'Повседневная практика показывает, что граница обучения кадров представляет собой интересный эксперимент проверки инновационных методов управления процессами. Предварительные выводы неутешительны: существующая теория играет определяющее значение для новых принципов формирования материально-технической и кадровой базы! Разнообразный и богатый опыт говорит нам, что дальнейшее развитие различных форм деятельности, а также свежий взгляд на привычные вещи — безусловно открывает новые горизонты для своевременного выполнения сверхзадачи.'),
        (gen_random_uuid(),
         'Также как новая модель организационной деятельности создаёт предпосылки для экспериментов, поражающих по своей масштабности и грандиозности. Таким образом, понимание сути ресурсосберегающих технологий способствует повышению качества системы массового участия. Значимость этих проблем настолько очевидна, что высокотехнологичная концепция общественного уклада, а также свежий взгляд на привычные вещи — безусловно открывает новые горизонты для благоприятных перспектив.');
-insert into public.programming_languages(uuid, name)
-values (gen_random_uuid(), 'Python'),
-       (gen_random_uuid(), 'Java'),
-       (gen_random_uuid(), 'Golang'),
-       (gen_random_uuid(), 'TypeScript'),
-       (gen_random_uuid(), 'HTML'),
-       (gen_random_uuid(), 'Kotlin'),
-       (gen_random_uuid(), 'SQL');
+insert into public.programming_languages(uuid, name, logo)
+values (gen_random_uuid(), 'Python', 'https://profilinator.rishav.dev/skills-assets/python-original.svg'),
+       (gen_random_uuid(), 'Java', 'https://profilinator.rishav.dev/skills-assets/java-original-wordmark.svg'),
+       (gen_random_uuid(), 'Golang', 'https://profilinator.rishav.dev/skills-assets/go-original.svg'),
+       (gen_random_uuid(), 'JavaScript', 'https://profilinator.rishav.dev/skills-assets/javascript-original.svg'),
+       (gen_random_uuid(), 'TypeScript', 'https://profilinator.rishav.dev/skills-assets/typescript-original.svg'),
+       (gen_random_uuid(), 'HTML5', 'https://profilinator.rishav.dev/skills-assets/html5-original-wordmark.svg'),
+       (gen_random_uuid(), 'Kotlin', 'https://profilinator.rishav.dev/skills-assets/kotlinlang-icon.svg'),
+       (gen_random_uuid(), 'PostgreSQL',
+        'https://profilinator.rishav.dev/skills-assets/postgresql-original-wordmark.svg'),
+       (gen_random_uuid(), 'CSS3', 'https://profilinator.rishav.dev/skills-assets/css3-original-wordmark.svg'),
+       (gen_random_uuid(), 'C#', 'https://profilinator.rishav.dev/skills-assets/csharp-original.svg'),
+       (gen_random_uuid(), 'Scala', 'https://profilinator.rishav.dev/skills-assets/scala-original-wordmark.svg'),
+       (gen_random_uuid(), 'Dart', 'https://profilinator.rishav.dev/skills-assets/dartlang-icon.svg'),
+       (gen_random_uuid(), 'C', 'https://profilinator.rishav.dev/skills-assets/c-original.svg'),
+       (gen_random_uuid(), 'PHP', 'https://profilinator.rishav.dev/skills-assets/php-original.svg'),
+       (gen_random_uuid(), 'C++', 'https://profilinator.rishav.dev/skills-assets/cplusplus-original.svg'),
+       (gen_random_uuid(), 'Rust', 'https://profilinator.rishav.dev/skills-assets/rust-plain.svg'),
+       (gen_random_uuid(), 'Sass', 'https://profilinator.rishav.dev/skills-assets/sass-original.svg');
 
 insert into public.code_examples(uuid, content, programming_language_uuid)
 values (gen_random_uuid(), 'def check():
@@ -83,29 +95,30 @@ values (gen_random_uuid(), 'def check():
                                from public.programming_languages
                                where name = 'Python')),
        (gen_random_uuid(), '@Transactional
-    public GalaxyDto updateGalaxy(Long galaxyId, UpdateGalaxyDto galaxy) {
-        Galaxy updatedGalaxy = galaxyRepository
-                .findById(galaxyId)
-                .orElseThrow(() -> new GalaxyNotFoundException(galaxyId));
+public GalaxyDto updateGalaxy(Long galaxyId, UpdateGalaxyDto galaxy) {
+    Galaxy updatedGalaxy = galaxyRepository
+            .findById(galaxyId)
+            .orElseThrow(() -> new GalaxyNotFoundException(galaxyId));
 
-        galaxyValidatorService.validatePutRequest(galaxyId, galaxy);
+    galaxyValidatorService.validatePutRequest(galaxyId, galaxy);
 
-        updatedGalaxy.setGalaxyName(galaxy.getGalaxyName());
-        updatedGalaxy.setGalaxyDescription(galaxy.getGalaxyDescription());
+    updatedGalaxy.setGalaxyName(galaxy.getGalaxyName());
+    updatedGalaxy.setGalaxyDescription(galaxy.getGalaxyDescription());
 
-        return mapper.map(
-                galaxyRepository.save(updatedGalaxy),
-                GalaxyDto.class
-        );
-    }
+    return mapper.map(
+            galaxyRepository.save(updatedGalaxy),
+            GalaxyDto.class
+    );
+}
 
-    @Transactional
-    public MessageDto deleteGalaxy(Long galaxyId) {
-        galaxyRepository.deleteById(galaxyId);
-        return new MessageDto("Галактика " + galaxyId + " была уничтожена квазаром");
-    }', (select uuid
-         from public.programming_languages
-         where name = 'Java')),
+@Transactional
+public MessageDto deleteGalaxy(Long galaxyId) {
+    galaxyRepository.deleteById(galaxyId);
+    return new MessageDto("Галактика " + galaxyId + " была уничтожена квазаром");
+}
+', (select uuid
+    from public.programming_languages
+    where name = 'Java')),
        (gen_random_uuid(), 'func (s *PostService) GetPostByUUID(uuid string) (getPostDto dto.GetPostDto, err error) {
 	post, err := s.repo.GetPostByUUID(uuid)
 	if err != nil {
@@ -197,32 +210,32 @@ func (s *PostService) GetPosts() (postsDto []dto.GetPostDto, err error) {
         </div>
     </header>', (select uuid
                  from public.programming_languages
-                 where name = 'HTML')),
+                 where name = 'HTML5')),
        (gen_random_uuid(), 'companion object {
-        private val COMPARATOR = object : DiffUtil.ItemCallback<Favorites.Favorite>() {
-            override fun areItemsTheSame(
-                oldItem: Favorites.Favorite,
-                newItem: Favorites.Favorite
-            ): Boolean =
-                oldItem.id == newItem.id
+    private val COMPARATOR = object : DiffUtil.ItemCallback<Favorites.Favorite>() {
+        override fun areItemsTheSame(
+            oldItem: Favorites.Favorite,
+            newItem: Favorites.Favorite
+        ): Boolean =
+            oldItem.id == newItem.id
 
-            override fun areContentsTheSame(
-                oldItem: Favorites.Favorite,
-                newItem: Favorites.Favorite
-            ): Boolean =
-                oldItem == newItem
-        }
+        override fun areContentsTheSame(
+            oldItem: Favorites.Favorite,
+            newItem: Favorites.Favorite
+        ): Boolean =
+            oldItem == newItem
     }
+}
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavoriteViewHolder {
-        val binding =
-            FavoriteItemBinding.inflate(LayoutInflater.from(parent.context), parent, false).apply {
-                this.lifecycleOwner = fragmentLifecycleOwner
-            }
-        return FavoriteViewHolder(binding)
-    }', (select uuid
-         from public.programming_languages
-         where name = 'Kotlin')),
+override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavoriteViewHolder {
+    val binding =
+        FavoriteItemBinding.inflate(LayoutInflater.from(parent.context), parent, false).apply {
+            this.lifecycleOwner = fragmentLifecycleOwner
+        }
+    return FavoriteViewHolder(binding)
+}', (select uuid
+     from public.programming_languages
+     where name = 'Kotlin')),
        (gen_random_uuid(), 'WITH RECURSIVE r AS (
    SELECT dependency_id,child_id, parent_id, is_alternative
    FROM system_dependency
@@ -239,4 +252,88 @@ func (s *PostService) GetPosts() (postsDto []dto.GetPostDto, err error) {
 SELECT * FROM r
 WHERE parent_id = ?1', (select uuid
                         from public.programming_languages
-                        where name = 'SQL'));
+                        where name = 'PostgreSQL')),
+       (gen_random_uuid(), 'public static async Task Main(string[] args)
+{
+    try
+    {
+        var services = new ServiceCollection();
+        ConfigureServices(services);
+        await using var provider = services.BuildServiceProvider();
+
+        await MigrationUp(provider);
+
+        _redditBotService = provider.GetService<IRedditBotService>();
+        if (_redditBotService is null)
+            throw new Exception("App error: RedditBotService not found.");
+
+        await _redditBotService.Work();
+    }
+    catch (Exception e)
+    {
+        Logger.LogError($"App error: {e.Message}");
+    }
+    finally
+    {
+        LogManager.Shutdown();
+    }
+}', (select uuid
+     from public.programming_languages
+     where name = 'C#')),
+       (gen_random_uuid(), '@import ''@app/styles/variables.scss'';
+
+.card {
+    display: flex;
+    flex-direction: column;
+    background: $black;
+    min-width: 118px;
+    border-radius: 8px;
+    transition: 0.3s;
+    outline: 1px solid transparent;
+
+    &--size-large {
+        padding: 24px 24px;
+    }
+
+    &--size-medium {
+        padding: 16px 24px;
+    }
+
+    &--size-small {
+        padding: 8px 16px;
+    }
+
+    &--glow {
+        &:hover {
+            outline: 1px solid $primary-500;
+        }
+    }
+}', (select uuid
+     from public.programming_languages
+     where name = 'Sass')),
+       (gen_random_uuid(), 'void show_box(GtkWidget *window) {
+    GtkWidget *vbox;
+    char *names[] = {_U("Проснулся"), _U("Зорядка"), _U("Покакать"), _U("Встать с кроватки")};
+    vbox = gtk_vbox_new(TRUE, 5);
+    for (int i = 0; i < 4; i++) {
+        GtkWidget *button = gtk_button_new_with_label(names[i]);
+        gtk_box_pack_start(GTK_BOX(vbox), button, TRUE, TRUE, 10);
+        g_signal_connect_swapped(G_OBJECT(button), "clicked", G_CALLBACK(gtk_widget_destroy), (gpointer)button);
+    }
+    gtk_container_add(GTK_CONTAINER(window), vbox);
+}
+
+int main (int argc, char *argv[]) {
+  GtkWidget *win = NULL;
+  gtk_init (&argc, &argv);
+  win = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_title(GTK_WINDOW(win), _U("ХОЧУ КУШАТЬ"));
+  gtk_window_set_default_size(GTK_WINDOW(win), 500, 500);
+  g_signal_connect (win, "destroy", gtk_main_quit, NULL);
+  show_box(win);
+  gtk_widget_show_all (win);
+  gtk_main ();
+  return 0;
+}', (select uuid
+     from public.programming_languages
+     where name = 'C'));
