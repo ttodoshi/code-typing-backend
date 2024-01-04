@@ -13,3 +13,4 @@ docker compose up -d
 ### all services:
 
 - [text service](https://github.com/ttodoshi/speed-typing-text-service)
+- [gateway service](https://github.com/ttodoshi/speed-typing-gateway-service)

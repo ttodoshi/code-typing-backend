@@ -1,7 +1,33 @@
 version: '3.5'
 services:
-  postgres:
-    container_name: postgres_text_db_container
+  consul:
+    image: consul:1.15.4
+    container_name: consul
+    ports:
+      - "8500:8500"
+      - "8600:8600"
+      - "8600:8600/udp"
+    command: "agent -dev -client 0.0.0.0 -ui"
+    environment:
+      CONSUL_BIND_INTERFACE: eth0
+    networks:
+      - speed-typing
+    restart: always
+  speed-typing-gateway-service:
+    container_name: speed-typing-text-gateway-container
+    image: ghcr.io/ttodoshi/speed-typing-gateway-service:latest
+    ports:
+      - "8443:8443"
+    depends_on:
+      - consul
+    environment:
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONSUL_PORT: 8500
+    networks:
+      - speed-typing
+
+  postgres-text-db:
+    container_name: postgres-text-db-container
     image: postgres
     environment:
       POSTGRES_USER: postgres
@@ -20,24 +46,26 @@ services:
       retries: 3
       start_period: 5s
     networks:
-      speed_typing:
+      - speed-typing
     restart: unless-stopped
 
-  speed_typing_text_service:
-    container_name: speed_typing_text_service_container
+  speed-typing-text-service:
+    container_name: speed-typing-text-service-container
     image: ghcr.io/ttodoshi/speed-typing-text-service:latest
     ports:
       - "8080:8080"
     depends_on:
-      postgres:
+      postgres-text-db:
         condition: service_healthy
     environment:
       PORT: 8080
       PROFILE: "dev"# dev, prod
       LOG_LEVEL: "debug"#trace, debug, info, warn, error
-      DB_URL: "host=postgres user=postgres password=pass dbname=text_db port=5432 sslmode=disable"
+      DB_URL: "host=postgres-text-db user=postgres password=pass dbname=text_db port=5432 sslmode=disable"
+      CONSUL_HOST: "consul:8500"
+      CONSUL_SERVICE_ADDRESS: "speed-typing-text-service"
     networks:
-      speed_typing:
+      - speed-typing
 
 #  mongo:
 #    image: mongo
@@ -54,7 +82,7 @@ services:
 #    restart: unless-stopped
 
 networks:
-  speed_typing:
+  speed-typing:
     driver: bridge
 
 volumes:
