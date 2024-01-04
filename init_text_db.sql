@@ -336,4 +336,100 @@ int main (int argc, char *argv[]) {
   return 0;
 }', (select uuid
      from public.programming_languages
-     where name = 'C'));
+     where name = 'C')),
+    (gen_random_uuid(), 'public function decline(Request $request) {
+        $request->validate([
+            ''id'' => ''required'',
+            ''declineReason'' => ''required''
+        ]);
+
+        Application::where(''id'', $request->id)->update([''status'' => ''declined'', ''decline_reason'' => $request->declineReason]);
+        return response()->json([''success'' => $request->declineReason], 200);
+    }
+
+    public function accept(Request $request) {
+        $request->validate([
+            ''id'' => ''required''
+        ]);
+
+        Application::where(''id'', $request->id)->update([''status'' => ''accepted'']);
+        return response()->json([''success'' => ''успех''], 200);
+    }', (select uuid
+         from public.programming_languages
+         where name = 'PHP')),
+    (gen_random_uuid(), 'const inputForm = document.getElementById(''formInput'')
+const buttonConfirmForm = document.getElementById(''create'')
+const listForm = document.getElementById(''list'')
+const notes = []
+
+function render() {
+    listForm.innerHTML=""
+    if(notes==0){
+        listForm.innerHTML=''<p>Нет элементов</p>''
+    }
+    for(let i = 0;i<notes.length;i++){
+        listForm.insertAdjacentHTML(''beforeend'',getNoteTemplate(notes[i],i))
+    }
+}
+
+render()
+
+buttonConfirmForm.onclick = () => {
+    if (inputForm.value.length === 0) {
+        return
+    }
+    const newNote = {
+        title: inputForm.value,
+        complited: false
+    }
+    listForm.insertAdjacentHTML(''beforeend'', getNoteTemplate(newNote))
+    notes.push(newNote)
+    render()
+    inputForm.value = ''''
+
+}', (select uuid
+     from public.programming_languages
+     where name = 'JavaScript')),
+    (gen_random_uuid(), '* {
+    padding: 0pt;
+    margin: 0pt;
+    box-sizing: border-box;
+}
+
+.to-do-list {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.container {
+    margin: 0 auto;
+    max-width: 450px;
+    width: 100%;
+}', (select uuid
+     from public.programming_languages
+     where name = 'CSS3')),
+    (gen_random_uuid(), '#include "sbscheduler.hpp"
+#include <QTimer>
+
+QDateTime scheduler::cfglmd;
+
+int main(int argc, char *argv[])
+{
+    QCoreApplication a(argc, argv);
+    sb::ldtltr();
+    scheduler s;
+
+    QTimer::singleShot(0, &s,
+#if QT_VERSION < QT_VERSION_CHECK(5, 4, 0)
+        SLOT(main())
+#else
+        &scheduler::main
+#endif
+        );
+
+    uchar rv(a.exec());
+    return rv;
+}', (select uuid
+     from public.programming_languages
+     where name = 'C++'));
