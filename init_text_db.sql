@@ -186,6 +186,35 @@ func (s *PostService) GetPosts() (postsDto []dto.GetPostDto, err error) {
     )', (select uuid
          from public.programming_languages
          where name = 'TypeScript')),
+       (gen_random_uuid(), 'const {data: comments, isFetching, isLoading} =
+    useGetCommentsQuery({
+        page: pageNumber
+    })
+
+useEffect(() => {
+    setCommentsWithPagination(prev => {
+        return [...prev, ...comments ?? []]
+    })
+}, [comments]);
+
+useEffect(() => {
+    if (!observerElementRef.current) return
+    if (isFetching || isLoading) return
+
+    const callback: IntersectionObserverCallback = (entries,) => {
+        if (entries[0].isIntersecting && pageNumber < 10 && comments?.length !== 0) {
+            console.log(''callback'', comments)
+            setPageNumber(prev => prev + 1)
+        }
+    };
+
+    observerRef.current = new IntersectionObserver(callback);
+    observerRef.current.observe(observerElementRef.current)
+
+    return () => observerRef.current?.disconnect()
+}, [commentsWithPagination])', (select uuid
+                                from public.programming_languages
+                                where name = 'TypeScript')),
        (gen_random_uuid(), '<header class="header">
         <div class="wrapper">
             <div class="header_wrapper">
@@ -337,7 +366,7 @@ int main (int argc, char *argv[]) {
 }', (select uuid
      from public.programming_languages
      where name = 'C')),
-    (gen_random_uuid(), 'public function decline(Request $request) {
+       (gen_random_uuid(), 'public function decline(Request $request) {
         $request->validate([
             ''id'' => ''required'',
             ''declineReason'' => ''required''
@@ -357,7 +386,7 @@ int main (int argc, char *argv[]) {
     }', (select uuid
          from public.programming_languages
          where name = 'PHP')),
-    (gen_random_uuid(), 'const inputForm = document.getElementById(''formInput'')
+       (gen_random_uuid(), 'const inputForm = document.getElementById(''formInput'')
 const buttonConfirmForm = document.getElementById(''create'')
 const listForm = document.getElementById(''list'')
 const notes = []
@@ -390,7 +419,25 @@ buttonConfirmForm.onclick = () => {
 }', (select uuid
      from public.programming_languages
      where name = 'JavaScript')),
-    (gen_random_uuid(), '* {
+       (gen_random_uuid(), 'const NewsItem = ({ item }) => {
+  return (
+    <div className={styles.newsItemBox}>
+      <div
+        className={styles.imgNews}
+        style={{ backgroundImage: `url(${item.image})` }}
+      />
+      <div className={styles.articleNewsItem}>
+        <h3 className={styles.titleNews}>{item.title}</h3>
+        <p className={styles.descNews}>{formatTimeAgo(item.published)}</p>
+      </div>
+    </div>
+  );
+};
+
+export default NewsItem;', (select uuid
+                            from public.programming_languages
+                            where name = 'JavaScript')),
+       (gen_random_uuid(), '* {
     padding: 0pt;
     margin: 0pt;
     box-sizing: border-box;
@@ -409,7 +456,61 @@ buttonConfirmForm.onclick = () => {
 }', (select uuid
      from public.programming_languages
      where name = 'CSS3')),
-    (gen_random_uuid(), '#include "sbscheduler.hpp"
+       (gen_random_uuid(), '#app {
+    margin: 20px 10px;
+    min-height: 100vh;
+    width: 100%;
+}
+
+.p {
+    width: 100%;
+    height: 3em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    color: #fff;
+}
+
+input {
+     width: 50%;
+     padding: 10px 25px;
+     border: none;
+     background: rgba(250, 250, 250, 0.5);
+     text-align: center;
+     border-radius: 10px;
+     box-shadow: 0 0 20px rgb(72, 72, 72, 0.8);
+     text-transform: uppercase;
+     color: #fff;
+     font-weight: 900;
+     letter-spacing: 2px;
+}', (select uuid
+     from public.programming_languages
+     where name = 'CSS3')),
+       (gen_random_uuid(), 'body {
+    display: flex;
+    flex-direction: column;
+    font-family: basier-circle,sans-serif;
+    min-height: 100vh;
+}
+
+button {
+    font-size: 18px;
+    background-color: #d9d9d9;
+    border:3px solid #000000;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.screen-nav-wrapper {
+    width: 411px;
+    overflow: hidden;
+    box-shadow: 2px 5px 7px 3px rgba(0, 0, 0, 0.675);
+
+}', (select uuid
+     from public.programming_languages
+     where name = 'CSS3')),
+       (gen_random_uuid(), '#include "sbscheduler.hpp"
 #include <QTimer>
 
 QDateTime scheduler::cfglmd;

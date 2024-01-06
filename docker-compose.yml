@@ -63,23 +63,52 @@ services:
       LOG_LEVEL: "debug"#trace, debug, info, warn, error
       DB_URL: "host=postgres-text-db user=postgres password=pass dbname=text_db port=5432 sslmode=disable"
       CONSUL_HOST: "consul:8500"
+      CONSUL_SERVICE_NAME: "text-service"
       CONSUL_SERVICE_ADDRESS: "speed-typing-text-service"
     networks:
       - speed-typing
 
-#  mongo:
-#    image: mongo
-#    container_name: mongo_container
-#    environment:
-#      - MONGO_INITDB_ROOT_USERNAME=admin
-#      - MONGO_INITDB_ROOT_PASSWORD=pass
-#    volumes:
-#      - mongo:/data/db
-#    ports:
-#      - '27017:27017'
-#    networks:
-#      speed_typing:
-#    restart: unless-stopped
+  mongo:
+    image: mongo
+    container_name: mongo-container
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=pass
+    volumes:
+      - mongo:/data/db
+    ports:
+      - '27017:27017'
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      retries: 3
+      start_period: 5s
+    networks:
+      speed-typing:
+    restart: unless-stopped
+
+  speed-typing-auth-service:
+    container_name: speed-typing-auth-service-container
+    image: ghcr.io/ttodoshi/speed-typing-auth-service:latest
+    ports:
+      - "8090:8090"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      ACCESS_TOKEN_EXP_SECONDS: "300s"
+      REFRESH_TOKEN_EXP_SECONDS: "1209600s"
+      COOKIE_HOST: "localhost"
+      SECRET_KEY: "Popa"
+      PORT: 8090
+      PROFILE: "dev"# dev, prod
+      LOG_LEVEL: "debug"#trace, debug, info, warn, error
+      DB_URL: "mongodb://admin:pass@mongo:27017"
+      CONSUL_HOST: "consul:8500"
+      CONSUL_SERVICE_NAME: "auth-service"
+      CONSUL_SERVICE_ADDRESS: "speed-typing-auth-service"
+    networks:
+      - speed-typing
 
 networks:
   speed-typing:
@@ -87,4 +116,4 @@ networks:
 
 volumes:
   postgres:
-#  mongo:
+  mongo:
