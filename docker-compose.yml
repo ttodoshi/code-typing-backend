@@ -13,8 +13,9 @@ services:
     networks:
       - speed-typing
     restart: always
+
   speed-typing-gateway-service:
-    container_name: speed-typing-text-gateway-container
+    container_name: speed-typing-gateway-service-container
     image: ghcr.io/ttodoshi/speed-typing-gateway-service:latest
     ports:
       - "8443:8443"
@@ -96,10 +97,10 @@ services:
       mongo:
         condition: service_healthy
     environment:
-      ACCESS_TOKEN_EXP_SECONDS: "300s"
-      REFRESH_TOKEN_EXP_SECONDS: "1209600s"
+      ACCESS_TOKEN_EXP: 300
+      REFRESH_TOKEN_EXP: 1209600
       COOKIE_HOST: "localhost"
-      SECRET_KEY: "Popa"
+      SECRET_KEY: "secretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecret"
       PORT: 8090
       PROFILE: "dev"# dev, prod
       LOG_LEVEL: "debug"#trace, debug, info, warn, error
@@ -110,6 +111,33 @@ services:
     networks:
       - speed-typing
 
+  redis:
+    container_name: redis
+    image: redis:latest
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --loglevel warning
+    volumes:
+      - redis:/data
+    networks:
+      - speed-typing
+
+  speed-typing-result-service:
+    container_name: speed-typing-result-service-container
+    image: ghcr.io/ttodoshi/speed-typing-result-service:latest
+    ports:
+      - "8070:8070"
+    depends_on:
+      - consul
+    environment:
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONSUL_PORT: 8500
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_MONGODB_URI: mongodb://admin:pass@mongo:27017
+    networks:
+      - speed-typing
+
 networks:
   speed-typing:
     driver: bridge
@@ -117,3 +145,4 @@ networks:
 volumes:
   postgres:
   mongo:
+  redis:
