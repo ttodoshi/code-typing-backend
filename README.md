@@ -1,8 +1,8 @@
-# Backend for speed typing project
+# Backend for Code Typing project
 
-this is the main repo for all speed-typing microservices
+this is the main repo for all code-typing microservices
 
-[the backend is being created for this speed-typing frontend repo](https://github.com/denischagin/speed-typing-new)
+[the backend is being created for this code-typing frontend repo](https://github.com/denischagin/code-typing)
 
 ### how to run:
 
@@ -16,7 +16,7 @@ docker compose up -d
 
 ### all services:
 
-- [gateway service](https://github.com/ttodoshi/speed-typing-gateway-service)
-- [result service](https://github.com/ttodoshi/speed-typing-result-service)
-- [auth service](https://github.com/ttodoshi/speed-typing-auth-service)
-- [text service](https://github.com/ttodoshi/speed-typing-text-service)
+- [gateway service](https://github.com/ttodoshi/code-typing-gateway-service)
+- [result service](https://github.com/ttodoshi/code-typing-result-service)
+- [auth service](https://github.com/ttodoshi/code-typing-auth-service)
+- [text service](https://github.com/ttodoshi/code-typing-text-service)

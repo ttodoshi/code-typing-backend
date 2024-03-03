@@ -11,12 +11,12 @@ services:
     environment:
       CONSUL_BIND_INTERFACE: eth0
     networks:
-      - speed-typing
+      - code-typing
     restart: always
 
-  speed-typing-gateway-service:
-    container_name: speed-typing-gateway-service-container
-    image: ghcr.io/ttodoshi/speed-typing-gateway-service:latest
+  code-typing-gateway-service:
+    container_name: code-typing-gateway-service-container
+    image: ghcr.io/ttodoshi/code-typing-gateway-service:latest
     ports:
       - "8443:8443"
     depends_on:
@@ -25,7 +25,7 @@ services:
       SPRING_CLOUD_CONSUL_HOST: consul
       SPRING_CLOUD_CONSUL_PORT: 8500
     networks:
-      - speed-typing
+      - code-typing
 
   postgres-text-db:
     container_name: postgres-text-db-container
@@ -47,12 +47,12 @@ services:
       retries: 3
       start_period: 5s
     networks:
-      - speed-typing
+      - code-typing
     restart: unless-stopped
 
-  speed-typing-text-service:
-    container_name: speed-typing-text-service-container
-    image: ghcr.io/ttodoshi/speed-typing-text-service:latest
+  code-typing-text-service:
+    container_name: code-typing-text-service-container
+    image: ghcr.io/ttodoshi/code-typing-text-service:latest
     ports:
       - "8080:8080"
     depends_on:
@@ -65,9 +65,9 @@ services:
       DB_URL: "host=postgres-text-db user=postgres password=pass dbname=text_db port=5432 sslmode=disable"
       CONSUL_HOST: "consul:8500"
       CONSUL_SERVICE_NAME: "text-service"
-      CONSUL_SERVICE_ADDRESS: "speed-typing-text-service"
+      CONSUL_SERVICE_ADDRESS: "code-typing-text-service"
     networks:
-      - speed-typing
+      - code-typing
 
   mongo:
     image: mongo
@@ -78,23 +78,25 @@ services:
     volumes:
       - mongo:/data/db
     ports:
-      - '27017:27017'
+      - "27017:27017"
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
       interval: 10s
       retries: 3
       start_period: 5s
     networks:
-      speed-typing:
+      code-typing:
     restart: unless-stopped
 
-  speed-typing-auth-service:
-    container_name: speed-typing-auth-service-container
-    image: ghcr.io/ttodoshi/speed-typing-auth-service:latest
+  code-typing-auth-service:
+    container_name: code-typing-auth-service-container
+    image: ghcr.io/ttodoshi/code-typing-auth-service:latest
     ports:
       - "8090:8090"
     depends_on:
       mongo:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     environment:
       ACCESS_TOKEN_EXP: 300
@@ -107,39 +109,59 @@ services:
       DB_URL: "mongodb://admin:pass@mongo:27017"
       CONSUL_HOST: "consul:8500"
       CONSUL_SERVICE_NAME: "auth-service"
-      CONSUL_SERVICE_ADDRESS: "speed-typing-auth-service"
+      CONSUL_SERVICE_ADDRESS: "code-typing-auth-service"
+      RABBITMQ_URL: "amqp://guest:guest@rabbitmq:5672/"
     networks:
-      - speed-typing
+      - code-typing
 
   redis:
     container_name: redis
     image: redis:latest
     restart: always
     ports:
-      - '6379:6379'
+      - "6379:6379"
     command: redis-server --loglevel warning
     volumes:
       - redis:/data
     networks:
-      - speed-typing
+      - code-typing
 
-  speed-typing-result-service:
-    container_name: speed-typing-result-service-container
-    image: ghcr.io/ttodoshi/speed-typing-result-service:latest
+  code-typing-result-service:
+    container_name: code-typing-result-service-container
+    image: ghcr.io/ttodoshi/code-typing-result-service:latest
     ports:
       - "8070:8070"
     depends_on:
-      - consul
+      rabbitmq:
+        condition: service_healthy
     environment:
       SPRING_CLOUD_CONSUL_HOST: consul
       SPRING_CLOUD_CONSUL_PORT: 8500
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_MONGODB_URI: mongodb://admin:pass@mongo:27017
+      SPRING_RABBITMQ_HOST: rabbitmq
     networks:
-      - speed-typing
+      - code-typing
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      retries: 3
+      start_period: 5s
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+      - code-typing
 
 networks:
-  speed-typing:
+  code-typing:
     driver: bridge
 
 volumes:
