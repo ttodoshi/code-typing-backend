@@ -59,6 +59,7 @@ services:
       postgres-text-db:
         condition: service_healthy
     environment:
+      SECRET_KEY: "secretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecret"
       PORT: 8080
       PROFILE: "dev"# dev, prod
       LOG_LEVEL: "debug"#trace, debug, info, warn, error
@@ -79,6 +80,9 @@ services:
       - mongo:/data/db
     ports:
       - "27017:27017"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
       interval: 10s
@@ -95,8 +99,6 @@ services:
       - "8090:8090"
     depends_on:
       mongo:
-        condition: service_healthy
-      rabbitmq:
         condition: service_healthy
     environment:
       ACCESS_TOKEN_EXP: 300
@@ -132,7 +134,7 @@ services:
     ports:
       - "8070:8070"
     depends_on:
-      rabbitmq:
+      mongo:
         condition: service_healthy
     environment:
       SPRING_CLOUD_CONSUL_HOST: consul

@@ -12,7 +12,7 @@ docker compose up -d
 
 ### architecture
 
-<img src="https://github.com/ttodoshi/speed-typing-backend/assets/98121690/08b2c63f-f3a7-49d5-bdf4-501ee5588a77" width="450"  alt="architecture"/>
+<img src="./architecture.png" width="450"  alt="architecture"/>
 
 ### all services:
 
