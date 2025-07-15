@@ -1,29 +1,35 @@
-version: '3.5'
 services:
   consul:
-    image: consul:1.15.4
+    image: consul:1.15
     container_name: consul
     ports:
       - "8500:8500"
       - "8600:8600"
       - "8600:8600/udp"
     command: "agent -dev -client 0.0.0.0 -ui"
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8500/v1/status/leader" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
     environment:
       CONSUL_BIND_INTERFACE: eth0
     networks:
       - code-typing
     restart: always
 
-  code-typing-gateway-service:
-    container_name: code-typing-gateway-service-container
-    image: ghcr.io/ttodoshi/code-typing-gateway-service:latest
+  fabio:
+    image: fabiolb/fabio
+    container_name: fabio
     ports:
-      - "8443:8443"
-    depends_on:
-      - consul
+      - "9999:9999"
+      - "9998:9998"
     environment:
-      SPRING_CLOUD_CONSUL_HOST: consul
-      SPRING_CLOUD_CONSUL_PORT: 8500
+      FABIO_REGISTRY_CONSUL_ADDR: "consul:8500"
+    depends_on:
+      consul:
+        condition: service_healthy
     networks:
       - code-typing
 
@@ -67,6 +73,7 @@ services:
       CONSUL_HOST: "consul:8500"
       CONSUL_SERVICE_NAME: "text-service"
       CONSUL_SERVICE_ADDRESS: "code-typing-text-service"
+      CONSUL_TAGS: "urlprefix-/api/v1/texts"
     networks:
       - code-typing
 
@@ -112,6 +119,7 @@ services:
       CONSUL_HOST: "consul:8500"
       CONSUL_SERVICE_NAME: "auth-service"
       CONSUL_SERVICE_ADDRESS: "code-typing-auth-service"
+      CONSUL_TAGS: "urlprefix-/api/v1/auth"
       RABBITMQ_URL: "amqp://guest:guest@rabbitmq:5672/"
     networks:
       - code-typing
@@ -139,6 +147,7 @@ services:
     environment:
       SPRING_CLOUD_CONSUL_HOST: consul
       SPRING_CLOUD_CONSUL_PORT: 8500
+      SPRING_CLOUD_CONSUL_DISCOVERY_TAGS: "urlprefix-/api/v1/results"
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_MONGODB_URI: mongodb://admin:pass@mongo:27017
       SPRING_RABBITMQ_HOST: rabbitmq
