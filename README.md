@@ -16,7 +16,6 @@ docker compose up -d
 
 ### all services:
 
-- [gateway service](https://github.com/ttodoshi/code-typing-gateway-service)
 - [result service](https://github.com/ttodoshi/code-typing-result-service)
 - [auth service](https://github.com/ttodoshi/code-typing-auth-service)
 - [text service](https://github.com/ttodoshi/code-typing-text-service)
